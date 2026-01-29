@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>CuraMind AI - My Reports</title>
+</head>
+<body style="font-family: sans-serif; padding: 20px;">
+    <h2>Patient Dashboard</h2>
+    <p>Logged in as: <strong>{{ request.user.username }}</strong></p>
+    <hr>
+    <h3>My Medical Records</h3>
+    <table border="1" cellpadding="10" style="border-collapse: collapse; width: 100%;">
+        <thead>
+            <tr style="background-color: #f2f2f2;">
+                <th>Date Uploaded</th>
+                <th>Description</th>
+                <th>AI Status</th>
+                <th>Document</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for report in reports %}
+            <tr>
+                <td>{{ report.uploaded_at|date:"F d, Y" }}</td>
+                <td>{{ report.description|default:"No description provided" }}</td>
+                <td>
+                    {% if report.is_analyzed %}
+                        <span style="color: green;">✅ Analyzed</span>
+                    {% else %}
+                        <span style="color: orange;">⏳ Pending AI Review</span>
+                    {% endif %}
+                </td>
+                <td>
+                    <a href="{{ report.document.url }}" target="_blank">View File</a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="4">No medical records found.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <br>
+    <a href="/admin/logout/">Logout</a>
+</body>
+</html>
