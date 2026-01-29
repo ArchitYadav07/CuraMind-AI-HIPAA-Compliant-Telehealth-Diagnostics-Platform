@@ -1,8 +1,30 @@
+import magic
 from django.db import models
 from django.conf import settings
+from django.core.exceptions import ValidationError
+
+# HIPAA Security: Validator to ensure only medical-grade files are uploaded
+def validate_medical_file(file):
+    # Read the first 2048 bytes to detect the actual file signature
+    file_content = file.read(2048)
+    file_mime = magic.from_buffer(file_content, mime=True)
+    file.seek(0)  # Reset pointer so Django can save the file later
+
+    # Allowed types for a diagnostic platform
+    accepted_types = [
+        'image/jpeg', 
+        'image/png', 
+        'application/dicom',  # Standard Medical Imaging
+        'application/pdf'     # Medical Reports
+    ]
+
+    if file_mime not in accepted_types:
+        raise ValidationError(
+            f"Security Alert: Unsupported file type ({file_mime}). "
+            "Only X-rays (JPEG/PNG), MRIs (DICOM), or PDFs are allowed."
+        )
 
 class MedicalRecord(models.Model):
-    # Links to your Custom User model
     patient = models.ForeignKey(
         settings.AUTH_USER_MODEL, 
         on_delete=models.CASCADE, 
@@ -15,13 +37,15 @@ class MedicalRecord(models.Model):
         related_name='assigned_diagnostics'
     )
     
-    # The actual file (X-ray, MRI, Report)
-    document = models.FileField(upload_to='medical_records/%Y/%m/%d/')
+    # Document field now includes the security validator
+    document = models.FileField(
+        upload_to='medical_records/%Y/%m/%d/',
+        validators=[validate_medical_file]
+    )
     
-    # Metadata
     description = models.TextField(blank=True)
     uploaded_at = models.DateTimeField(auto_now_add=True)
-    is_analyzed = models.BooleanField(default=False) # For Week 3 AI integration
+    is_analyzed = models.BooleanField(default=False)
 
     def __str__(self):
         return f"Record: {self.patient.username} - {self.uploaded_at.strftime('%Y-%m-%d')}"
