@@ -1,14 +1,14 @@
-# config/urls.py
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 
 urlpatterns = [
-    # Changed 'admin.site.py_admin' to 'admin.site.urls'
     path('admin/', admin.site.urls),
+    # This connects your diagnostics app to the project
+    path('diagnostics/', include('apps.diagnostics.urls')),
 ]
 
-# This allows the browser to show the medical files you upload
+# This allows the browser to actually 'see' the uploaded X-rays
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
