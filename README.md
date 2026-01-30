@@ -85,12 +85,3 @@ python manage.py runserver
 ---
 
 Developed by **Archit Yadav**
-
-```
-
----
-
-### **Next Step**
-Now that your documentation is ready, are you ready to install **Redis** and **Celery** to begin the **Week 3** AI Integration?
-
-```
