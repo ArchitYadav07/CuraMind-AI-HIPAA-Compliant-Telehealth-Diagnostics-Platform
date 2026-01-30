@@ -1,4 +1,5 @@
 <div align="center">
+ 
  #CuraMind AI: HIPAA-Compliant Telehealth & Diagnostics Platform
 
 ![Django](https://img.shields.io/badge/Django-5.0+-092e20?style=for-the-badge&logo=django)
