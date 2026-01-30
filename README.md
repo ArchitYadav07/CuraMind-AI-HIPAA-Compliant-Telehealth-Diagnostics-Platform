@@ -1,6 +1,6 @@
 <div align="center">
  #CuraMind AI: HIPAA-Compliant Telehealth & Diagnostics Platform
-<br>
+
 ![Django](https://img.shields.io/badge/Django-5.0+-092e20?style=for-the-badge&logo=django)
 ![Python](https://img.shields.io/badge/Python-3.12+-3776ab?style=for-the-badge&logo=python)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16+-336791?style=for-the-badge&logo=postgresql)
@@ -8,7 +8,7 @@
 ![Celery](https://img.shields.io/badge/Celery-Distributed_Tasks-37814a?style=for-the-badge&logo=celery)
 ![License](https://img.shields.io/badge/Security-HIPAA_Compliant-blue?style=for-the-badge)
 <br>
- <br>
+<br>
 </div>
 CuraMind AI is a secure, modular diagnostic platform designed to bridge the gap between patients and doctors through AI-driven medical image analysis. It features robust Role-Based Access Control (RBAC), secure DICOM/image handling, and asynchronous processing for high-performance diagnostics.
 
