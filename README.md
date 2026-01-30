@@ -1,5 +1,5 @@
 
-#CuraMind AI: HIPAA-Compliant Telehealth & Diagnostics Platform
+# CuraMind AI: HIPAA-Compliant Telehealth & Diagnostics Platform
 
 ![Django](https://img.shields.io/badge/Django-5.0+-092e20?style=for-the-badge&logo=django)
 ![Python](https://img.shields.io/badge/Python-3.12+-3776ab?style=for-the-badge&logo=python)
