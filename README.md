@@ -1,8 +1,4 @@
-Here is a comprehensive `README.md` file for **CuraMind AI**, including professional badges and a clear project overview. You can copy this into a file named `README.md` in your project's root directory.
 
----
-
-```markdown
 # CuraMind AI: HIPAA-Compliant Telehealth & Diagnostics Platform
 
 ![Django](https://img.shields.io/badge/Django-5.0+-092e20?style=for-the-badge&logo=django)
