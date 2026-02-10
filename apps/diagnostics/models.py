@@ -2,6 +2,8 @@ import magic
 from django.db import models
 from django.conf import settings
 from django.core.exceptions import ValidationError
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 
 # HIPAA Security: Validator to ensure only medical-grade files are uploaded
 def validate_medical_file(file):
@@ -49,3 +51,12 @@ class MedicalRecord(models.Model):
 
     def __str__(self):
         return f"Record: {self.patient.username} - {self.uploaded_at.strftime('%Y-%m-%d')}"
+    
+@receiver(post_save, sender=MedicalRecord)
+def trigger_ai_analysis(sender, instance, created, **kwargs):
+    if created:
+        from celery import current_app
+        current_app.send_task(
+            'apps.diagnostics.tasks.process_medical_image', # Add the 's' here!
+            args=[instance.id]
+        )

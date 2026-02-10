@@ -1,14 +1,10 @@
 import os
 from celery import Celery
 
-# Set default Django settings module
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.settings')
 
 app = Celery('CuraMindAI')
-
-# Using a string here means the worker doesn't have to serialize
-# the configuration object to child processes.
 app.config_from_object('django.conf:settings', namespace='CELERY')
 
-# Load task modules from all registered Django apps.
-app.autodiscover_tasks()
+# This tells Celery: "Look inside the 'apps' folder for any 'tasks.py' files"
+app.autodiscover_tasks(['apps.diagnostics'])
