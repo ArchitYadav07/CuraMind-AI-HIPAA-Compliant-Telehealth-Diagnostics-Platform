@@ -7,6 +7,8 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     # This connects your diagnostics app to the project
     path('diagnostics/', include('apps.diagnostics.urls')),
+
+    path('accounts/', include('django.contrib.auth.urls')),
 ]
 
 # This allows the browser to actually 'see' the uploaded X-rays
