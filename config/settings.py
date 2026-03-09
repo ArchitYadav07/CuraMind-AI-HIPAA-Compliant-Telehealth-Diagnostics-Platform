@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'storages',  # AWS S3 Storage
     'apps.users',
     'apps.diagnostics',
     'apps.appointments',
@@ -143,3 +144,24 @@ CELERY_BROKER_URL = 'redis://localhost:6379/0'
 CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
+
+# --- AWS S3 SECURE STORAGE (HIPAA Compliance Level) ---
+USE_S3 = os.getenv('USE_S3') == 'TRUE'
+
+if USE_S3:
+    # Use IAM Roles in production, or ENV vars for local
+    AWS_ACCESS_KEY_ID = os.getenv('AWS_ACCESS_KEY_ID')
+    AWS_SECRET_ACCESS_KEY = os.getenv('AWS_SECRET_ACCESS_KEY')
+    AWS_STORAGE_BUCKET_NAME = os.getenv('AWS_STORAGE_BUCKET_NAME')
+    AWS_S3_REGION_NAME = os.getenv('AWS_S3_REGION_NAME')
+    
+    # REQUIRED FOR SECURE MEDICAL DATA: Do not make bucket public
+    AWS_DEFAULT_ACL = 'private'
+    # Generate time-limited signed URLs dynamically when a user loads a dashboard
+    AWS_QUERYSTRING_AUTH = True
+    AWS_QUERYSTRING_EXPIRE = 300 # Link expires in 5 minutes
+    
+    # Django Storages config
+    DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+    # Optional: Serve static files from S3 as well (for production speed)
+    # STATICFILES_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'

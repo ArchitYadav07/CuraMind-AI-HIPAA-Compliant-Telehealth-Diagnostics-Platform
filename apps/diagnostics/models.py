@@ -45,6 +45,13 @@ class MedicalRecord(models.Model):
         validators=[validate_medical_file]
     )
     
+    # Store the generated AI heatmap
+    heatmap_image = models.ImageField(
+        upload_to='medical_records/heatmaps/%Y/%m/%d/',
+        blank=True,
+        null=True
+    )
+    
     description = models.TextField(blank=True)
     uploaded_at = models.DateTimeField(auto_now_add=True)
     is_analyzed = models.BooleanField(default=False)
