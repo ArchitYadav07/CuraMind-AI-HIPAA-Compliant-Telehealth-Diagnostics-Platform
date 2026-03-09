@@ -4,22 +4,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CuraMind AI - Patient Dashboard</title>
+    <title>CuraMind AI - Doctor/Admin Dashboard</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
             --primary: #092e20;
             --secondary: #3776ab;
             --accent: #dc382d;
-            --bg: #f3f6f9;
-            --surface: rgba(255, 255, 255, 0.85);
-            --text-main: #1e293b;
-            --text-light: #64748b;
+            --bg: #f8fafc;
+            --surface: #ffffff;
+            --text-main: #0f172a;
+            --text-light: #475569;
         }
 
         body {
             font-family: 'Inter', sans-serif;
-            background: linear-gradient(135deg, #e0e7ff 0%, #f3f6f9 100%);
+            background-color: var(--bg);
             color: var(--text-main);
             margin: 0;
             padding: 40px 20px;
@@ -27,7 +27,7 @@
         }
 
         .container {
-            max-width: 1000px;
+            max-width: 1200px;
             margin: 0 auto;
         }
 
@@ -43,15 +43,17 @@
             color: var(--primary);
             font-size: 28px;
             font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 12px;
         }
 
         .user-badge {
-            background: var(--surface);
+            background: #e2e8f0;
             padding: 10px 20px;
             border-radius: 30px;
-            backdrop-filter: blur(10px);
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
             font-weight: 500;
+            color: var(--text-main);
         }
 
         .logout-btn {
@@ -68,11 +70,9 @@
 
         .card {
             background: var(--surface);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.3);
             border-radius: 16px;
             padding: 30px;
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.08);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
             margin-bottom: 20px;
         }
 
@@ -86,14 +86,24 @@
         th {
             text-align: left;
             padding: 16px;
-            color: var(--text-light);
+            background-color: var(--primary);
+            color: white;
             font-weight: 600;
-            border-bottom: 2px solid rgba(0, 0, 0, 0.05);
+        }
+
+        th:first-child {
+            border-top-left-radius: 8px;
+            border-bottom-left-radius: 8px;
+        }
+
+        th:last-child {
+            border-top-right-radius: 8px;
+            border-bottom-right-radius: 8px;
         }
 
         td {
             padding: 16px;
-            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            border-bottom: 1px solid #e2e8f0;
             vertical-align: middle;
         }
 
@@ -101,12 +111,13 @@
             border-bottom: none;
         }
 
-        tr {
-            transition: background-color 0.2s;
+        tr:hover td {
+            background-color: #f1f5f9;
         }
 
-        tr:hover td {
-            background-color: rgba(255, 255, 255, 0.5);
+        .patient-name {
+            font-weight: 600;
+            color: var(--primary);
         }
 
         .status-badge {
@@ -132,30 +143,39 @@
             align-items: center;
             text-decoration: none;
             font-weight: 500;
-            transition: transform 0.2s;
+            padding: 8px 16px;
+            border-radius: 6px;
+            transition: all 0.2s;
+            margin-bottom: 8px;
         }
 
         .action-link:hover {
+            opacity: 0.9;
             transform: translateY(-1px);
         }
 
         .link-source {
-            color: var(--secondary);
-            margin-right: 15px;
+            background-color: #e0f2fe;
+            color: #0369a1;
         }
 
         .link-ai {
-            color: var(--accent);
-            background: #fee2e2;
-            padding: 6px 12px;
-            border-radius: 6px;
+            background-color: var(--accent);
+            color: white;
+            box-shadow: 0 2px 4px rgba(220, 56, 45, 0.2);
         }
 
         .empty-state {
             text-align: center;
-            padding: 40px;
+            padding: 60px;
             color: var(--text-light);
             font-style: italic;
+        }
+
+        .notes-text {
+            color: var(--text-light);
+            font-size: 14px;
+            line-height: 1.5;
         }
     </style>
 </head>
@@ -163,50 +183,54 @@
 <body>
     <div class="container">
         <div class="header">
-            <h2>CuraMind AI Portal</h2>
+            <h2>🩺 Medical Admin Dashboard</h2>
             <div class="user-badge">
-                👤 {{ request.user.username }}
-                <a href="/admin/logout/" class="logout-btn">Logout</a>
+                Dr. {{ request.user.username }}
+                <a href="/admin/logout/" class="logout-btn">Secure Logout</a>
             </div>
         </div>
 
         <div class="card">
-            <h3 style="margin-top: 0; color: var(--primary);">My Medical Records</h3>
+            <h3 style="margin-top: 0; color: var(--text-main); margin-bottom: 20px;">Assigned Patient Records</h3>
             <table>
                 <thead>
                     <tr>
+                        <th>Patient Name</th>
                         <th>Date Uploaded</th>
-                        <th>Medical Note</th>
-                        <th>AI Diagnostic Status</th>
-                        <th>Documents</th>
+                        <th>Clinical Notes</th>
+                        <th>AI Processing Status</th>
+                        <th>Secure Access</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for report in reports %}
                     <tr>
-                        <td style="font-weight: 500;">{{ report.uploaded_at|date:"M d, Y" }}</td>
-                        <td>{{ report.description|default:"No description provided"|truncatechars:50 }}</td>
+                        <td class="patient-name">{{ report.patient.username }}</td>
+                        <td style="color: var(--text-light); font-size: 14px;">{{ report.uploaded_at|date:"M d, Y H:i"
+                            }}</td>
+                        <td class="notes-text">{{ report.description|default:"No clinical notes"|truncatechars:80 }}
+                        </td>
                         <td>
                             {% if report.is_analyzed %}
-                            <span class="status-badge status-analyzed">✅ AI Analyzed</span>
+                            <span class="status-badge status-analyzed">✅ Analyzed</span>
                             {% else %}
-                            <span class="status-badge status-pending">⏳ Pending Review</span>
+                            <span class="status-badge status-pending">⏳ Pending Queue</span>
                             {% endif %}
                         </td>
                         <td>
                             <a href="{{ report.document.url }}" target="_blank" class="action-link link-source">📄
-                                Source</a>
+                                Source Document</a><br>
                             {% if report.heatmap_image %}
                             <a href="{{ report.heatmap_image.url }}" target="_blank" class="action-link link-ai">🔍 View
-                                AI Scope</a>
+                                AI Heatmap</a>
                             {% endif %}
                         </td>
                     </tr>
                     {% empty %}
                     <tr>
-                        <td colspan="4">
+                        <td colspan="5">
                             <div class="empty-state">
-                                No medical records found. Upload via your provider to get started.
+                                No assigned patients found in the system.
                             </div>
                         </td>
                     </tr>

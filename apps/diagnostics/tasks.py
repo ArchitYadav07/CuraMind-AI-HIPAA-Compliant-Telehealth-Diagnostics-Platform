@@ -2,6 +2,8 @@ import os
 import cv2
 import numpy as np
 import torch
+import pydicom
+from django.core.files.base import ContentFile
 from celery import shared_task
 from PIL import Image
 from torchvision.models import resnet50, ResNet50_Weights
@@ -22,7 +24,21 @@ def process_medical_image(record_id):
         
         # 1. Prepare Image
         img_path = record.document.path
-        img_pil = Image.open(img_path).convert('RGB')
+        
+        if img_path.lower().endswith('.dcm'):
+            dicom_data = pydicom.dcmread(img_path)
+            pixel_array = dicom_data.pixel_array
+            if np.max(pixel_array) > 0:
+                pixel_array = (pixel_array / np.max(pixel_array)) * 255.0
+            
+            img_cv_original = np.uint8(pixel_array)
+            if len(img_cv_original.shape) == 2:
+                img_cv_original = cv2.cvtColor(img_cv_original, cv2.COLOR_GRAY2RGB)
+            img_pil = Image.fromarray(img_cv_original)
+        else:
+            img_pil = Image.open(img_path).convert('RGB')
+            img_cv_original = cv2.cvtColor(np.array(img_pil), cv2.COLOR_RGB2BGR)
+
         input_tensor = preprocess(img_pil).unsqueeze(0)
         
         # 2. Hook into the last convolutional layer (layer4) for Heatmap
@@ -44,22 +60,23 @@ def process_medical_image(record_id):
         feature_map = features[0].detach().cpu().numpy()[0] # Shape: (2048, 7, 7)
         heatmap = np.mean(feature_map, axis=0) # Average across channels
         heatmap = np.maximum(heatmap, 0) # ReLU
-        heatmap /= np.max(heatmap) # Normalize to [0, 1]
+        if np.max(heatmap) > 0:
+            heatmap /= np.max(heatmap) # Normalize to [0, 1]
 
         # 5. Overlay on original image using OpenCV
-        img_cv = cv2.imread(img_path)
-        heatmap_resized = cv2.resize(heatmap, (img_cv.shape[1], img_cv.shape[0]))
+        heatmap_resized = cv2.resize(heatmap, (img_cv_original.shape[1], img_cv_original.shape[0]))
         heatmap_uint8 = np.uint8(255 * heatmap_resized)
         heatmap_color = cv2.applyColorMap(heatmap_uint8, cv2.COLORMAP_JET)
         
         # Superimpose: 60% original image + 40% heatmap
-        diagnostic_result = cv2.addWeighted(img_cv, 0.6, heatmap_color, 0.4, 0)
+        diagnostic_result = cv2.addWeighted(img_cv_original, 0.6, heatmap_color, 0.4, 0)
 
-        # 6. Save Heatmap to the same directory
+        # 6. Save Heatmap to Database Field
         heatmap_name = f"heatmap_{record_id}.jpg"
-        # Using record.document.path to find the directory
-        heatmap_path = os.path.join(os.path.dirname(img_path), heatmap_name)
-        cv2.imwrite(heatmap_path, diagnostic_result)
+        ret, buf = cv2.imencode('.jpg', diagnostic_result)
+        if ret:
+            content = ContentFile(buf.tobytes())
+            record.heatmap_image.save(heatmap_name, content, save=False)
         
         # 7. Update Database
         record.is_analyzed = True
@@ -74,4 +91,10 @@ def process_medical_image(record_id):
 
     except Exception as e:
         print(f"AI Error: {str(e)}")
+        # Update record with error so user is notified
+        try:
+            record.description += f"\n[AI Error]: Failed to process image. Reason: {str(e)}"
+            record.save()
+        except:
+            pass
         return f"Error: {str(e)}"
