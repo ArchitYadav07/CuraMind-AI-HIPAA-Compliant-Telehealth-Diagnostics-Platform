@@ -98,4 +98,4 @@ python manage.py runserver
 
 ---
 
-**Would you like me to help you create a Dockerfile or a `docker-compose.yml` to make this setup even easier for others to run?**
+
