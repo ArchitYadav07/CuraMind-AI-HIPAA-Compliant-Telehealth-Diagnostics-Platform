@@ -15,7 +15,7 @@ CuraMind AI is a secure, modular diagnostic platform designed to bridge the gap 
 
 | Input Medical X-Ray | AI-Generated Heatmap Analysis |
 | --- | --- |
-|  | <img src="media/medical_records/2026/03/09/x-ray-skull-from-right-side.jpg" width="400"> | <img src="media/medical_records/heatmaps/2026/03/09/heatmap_18.jpg" width="400"> |  |
+|  <img src="media/medical_records/2026/03/09/x-ray-skull-from-right-side.jpg" width="400"> | <img src="media/medical_records/heatmaps/2026/03/09/heatmap_18.jpg" width="400">  |
 | *Original skull X-ray uploaded by patient.* | *Grad-CAM visualization highlighting diagnostic focus.* |
 
 ## 🚀 Features
