@@ -3,6 +3,7 @@
 
 ![Django](https://img.shields.io/badge/Django-5.0+-092e20?style=for-the-badge&logo=django)
 ![Python](https://img.shields.io/badge/Python-3.12+-3776ab?style=for-the-badge&logo=python)
+![ResNet-50](https://img.shields.io/badge/Model-ResNet--50-ee4c2c?style=for-the-badge&logo=pytorch)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16+-336791?style=for-the-badge&logo=postgresql)
 ![Redis](https://img.shields.io/badge/Redis-Asynchronous-dc382d?style=for-the-badge&logo=redis)
 ![Celery](https://img.shields.io/badge/Celery-Distributed_Tasks-37814a?style=for-the-badge&logo=celery)
