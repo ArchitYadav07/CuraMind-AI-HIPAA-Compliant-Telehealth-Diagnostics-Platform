@@ -23,14 +23,15 @@ COPY requirements.txt /app/
 RUN pip install --upgrade pip
 RUN pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu
 RUN pip install -r requirements.txt
-# Ensure missing production dependencies are present
-RUN pip install gunicorn psycopg2-binary django-storages boto3 pydicom
 
 # Copy project
 COPY . /app/
 
+# Create staticfiles directory for WhiteNoise
+RUN mkdir -p /app/staticfiles
+
 # Expose port
 EXPOSE 8000
 
-# Run gunicorn (this command is generally overridden by docker-compose for workers)
-CMD ["gunicorn", "config.wsgi:application", "--bind", "0.0.0.0:8000", "--workers", "3"]
+# Run gunicorn with 1 worker (Render free tier: 512MB RAM limit)
+CMD ["gunicorn", "config.wsgi:application", "--bind", "0.0.0.0:8000", "--workers", "1", "--timeout", "120"]

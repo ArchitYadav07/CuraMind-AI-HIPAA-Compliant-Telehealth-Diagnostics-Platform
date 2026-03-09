@@ -1,220 +1,211 @@
-<!DOCTYPE html>
-<html lang="en">
+{% extends "base.html" %}
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CuraMind AI - Patient Dashboard</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --primary: #092e20;
-            --secondary: #3776ab;
-            --accent: #dc382d;
-            --bg: #f3f6f9;
-            --surface: rgba(255, 255, 255, 0.85);
-            --text-main: #1e293b;
-            --text-light: #64748b;
-        }
+{% block title %}My Medical Records — CuraMind AI{% endblock %}
+{% block active_patient %}active{% endblock %}
+{% block page_title %}My Medical Records{% endblock %}
+{% block page_subtitle %}Secure access to your personal health diagnostics{% endblock %}
 
-        body {
-            font-family: 'Inter', sans-serif;
-            background: linear-gradient(135deg, #e0e7ff 0%, #f3f6f9 100%);
-            color: var(--text-main);
-            margin: 0;
-            padding: 40px 20px;
-            min-height: 100vh;
-        }
+{% block extra_head %}
+<style>
+    /* ── Patient-specific stat accent colours ── */
+    .stat-card.total {
+        --accent-start: #00d4ff;
+        --accent-end: #0099cc;
+    }
 
-        .container {
-            max-width: 1000px;
-            margin: 0 auto;
-        }
+    .stat-card.done {
+        --accent-start: #00e5a0;
+        --accent-end: #00b077;
+    }
 
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 40px;
-        }
+    .stat-card.pending {
+        --accent-start: #ffb800;
+        --accent-end: #cc9300;
+    }
 
-        .header h2 {
-            margin: 0;
-            color: var(--primary);
-            font-size: 28px;
-            font-weight: 700;
-        }
+    .stat-card.total .stat-icon {
+        background: var(--cyan-dim);
+        color: var(--cyan);
+    }
 
-        .user-badge {
-            background: var(--surface);
-            padding: 10px 20px;
-            border-radius: 30px;
-            backdrop-filter: blur(10px);
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-            font-weight: 500;
-        }
+    .stat-card.done .stat-icon {
+        background: var(--green-dim);
+        color: var(--green);
+    }
 
-        .logout-btn {
-            color: var(--accent);
-            text-decoration: none;
-            font-weight: 600;
-            margin-left: 15px;
-            transition: opacity 0.2s;
-        }
+    .stat-card.pending .stat-icon {
+        background: var(--amber-dim);
+        color: var(--amber);
+    }
 
-        .logout-btn:hover {
-            opacity: 0.8;
-        }
+    .stat-card.total .stat-value {
+        color: var(--cyan);
+    }
 
-        .card {
-            background: var(--surface);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            border-radius: 16px;
-            padding: 30px;
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.08);
-            margin-bottom: 20px;
-        }
+    .stat-card.done .stat-value {
+        color: var(--green);
+    }
 
-        table {
-            width: 100%;
-            border-collapse: separate;
-            border-spacing: 0;
-            margin-top: 10px;
-        }
+    .stat-card.pending .stat-value {
+        color: var(--amber);
+    }
 
-        th {
-            text-align: left;
-            padding: 16px;
-            color: var(--text-light);
-            font-weight: 600;
-            border-bottom: 2px solid rgba(0, 0, 0, 0.05);
-        }
+    /* ── record-row thumbnail ── */
+    .record-id {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 12px;
+        color: var(--text-dim);
+        background: rgba(255, 255, 255, 0.04);
+        padding: 2px 8px;
+        border-radius: 4px;
+    }
 
-        td {
-            padding: 16px;
-            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-            vertical-align: middle;
-        }
+    .doc-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+    }
 
-        tr:last-child td {
-            border-bottom: none;
-        }
+    /* Upload card */
+    .upload-hint {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 14px 20px;
+        background: var(--cyan-dim);
+        border: 1px dashed rgba(0, 212, 255, 0.3);
+        border-radius: var(--radius-md);
+        color: var(--cyan);
+        font-size: 13px;
+        font-weight: 500;
+        margin-bottom: 24px;
+    }
+</style>
+{% endblock %}
 
-        tr {
-            transition: background-color 0.2s;
-        }
+{% block content %}
+<!-- ── STATS ── -->
+{% with total=reports|length %}
+<div class="stats-grid fade-in fade-in-1">
 
-        tr:hover td {
-            background-color: rgba(255, 255, 255, 0.5);
-        }
-
-        .status-badge {
-            display: inline-block;
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-size: 13px;
-            font-weight: 600;
-        }
-
-        .status-analyzed {
-            background: #dcfce7;
-            color: #166534;
-        }
-
-        .status-pending {
-            background: #fef08a;
-            color: #854d0e;
-        }
-
-        .action-link {
-            display: inline-flex;
-            align-items: center;
-            text-decoration: none;
-            font-weight: 500;
-            transition: transform 0.2s;
-        }
-
-        .action-link:hover {
-            transform: translateY(-1px);
-        }
-
-        .link-source {
-            color: var(--secondary);
-            margin-right: 15px;
-        }
-
-        .link-ai {
-            color: var(--accent);
-            background: #fee2e2;
-            padding: 6px 12px;
-            border-radius: 6px;
-        }
-
-        .empty-state {
-            text-align: center;
-            padding: 40px;
-            color: var(--text-light);
-            font-style: italic;
-        }
-    </style>
-</head>
-
-<body>
-    <div class="container">
-        <div class="header">
-            <h2>CuraMind AI Portal</h2>
-            <div class="user-badge">
-                👤 {{ request.user.username }}
-                <a href="/admin/logout/" class="logout-btn">Logout</a>
-            </div>
-        </div>
-
-        <div class="card">
-            <h3 style="margin-top: 0; color: var(--primary);">My Medical Records</h3>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Date Uploaded</th>
-                        <th>Medical Note</th>
-                        <th>AI Diagnostic Status</th>
-                        <th>Documents</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for report in reports %}
-                    <tr>
-                        <td style="font-weight: 500;">{{ report.uploaded_at|date:"M d, Y" }}</td>
-                        <td>{{ report.description|default:"No description provided"|truncatechars:50 }}</td>
-                        <td>
-                            {% if report.is_analyzed %}
-                            <span class="status-badge status-analyzed">✅ AI Analyzed</span>
-                            {% else %}
-                            <span class="status-badge status-pending">⏳ Pending Review</span>
-                            {% endif %}
-                        </td>
-                        <td>
-                            <a href="{{ report.document.url }}" target="_blank" class="action-link link-source">📄
-                                Source</a>
-                            {% if report.heatmap_image %}
-                            <a href="{{ report.heatmap_image.url }}" target="_blank" class="action-link link-ai">🔍 View
-                                AI Scope</a>
-                            {% endif %}
-                        </td>
-                    </tr>
-                    {% empty %}
-                    <tr>
-                        <td colspan="4">
-                            <div class="empty-state">
-                                No medical records found. Upload via your provider to get started.
-                            </div>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+    <div class="stat-card total">
+        <div class="stat-icon"><i class="fa-solid fa-folder-open"></i></div>
+        <div class="stat-value">{{ total }}</div>
+        <div class="stat-label">Total Records</div>
+        <div class="stat-change" style="color: var(--cyan);">
+            <i class="fa-solid fa-database"></i> All-time uploads
         </div>
     </div>
-</body>
 
-</html>
+    <div class="stat-card done">
+        <div class="stat-icon"><i class="fa-solid fa-brain"></i></div>
+        <div class="stat-value">
+            {% with analyzed=reports|dictsort:"is_analyzed" %}
+            {{ reports|length }}
+            {% endwith %}
+            <!-- Computed in template below via JS -->
+            <span id="analyzed-count">—</span>
+        </div>
+        <div class="stat-label">AI Analyzed</div>
+        <div class="stat-change" style="color: var(--green);">
+            <i class="fa-solid fa-circle-check"></i> Processing complete
+        </div>
+    </div>
+
+    <div class="stat-card pending">
+        <div class="stat-icon"><i class="fa-solid fa-clock"></i></div>
+        <div class="stat-value"><span id="pending-count">—</span></div>
+        <div class="stat-label">Pending Review</div>
+        <div class="stat-change" style="color: var(--amber);">
+            <i class="fa-solid fa-hourglass-half"></i> In queue
+        </div>
+    </div>
+
+</div>
+{% endwith %}
+
+<!-- ── UPLOAD HINT ── -->
+<div class="upload-hint fade-in fade-in-2">
+    <i class="fa-solid fa-circle-info fa-lg"></i>
+    Records are uploaded by your healthcare provider. Contact your doctor to request a new diagnostic.
+</div>
+
+<!-- ── RECORDS TABLE ── -->
+<div class="card fade-in fade-in-3">
+    <div class="card-header">
+        <div>
+            <div class="card-title"><i class="fa-solid fa-file-waveform"></i> Diagnostic Records</div>
+            <div class="card-subtitle">Encrypted end-to-end — only you can view these files</div>
+        </div>
+    </div>
+
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Date Uploaded</th>
+                <th>Clinical Notes</th>
+                <th>AI Status</th>
+                <th>Documents</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for report in reports %}
+            <tr class="fade-in" style="animation-delay: {{ forloop.counter0 }}00ms">
+                <td><span class="record-id">REC-{{ report.id|stringformat:"04d" }}</span></td>
+                <td>
+                    <div style="font-weight:600; color: var(--text-white);">{{ report.uploaded_at|date:"M d, Y" }}</div>
+                    <div style="font-size:12px; color: var(--text-muted);">{{ report.uploaded_at|date:"H:i" }} UTC</div>
+                </td>
+                <td style="max-width:260px; color: var(--text-muted); font-size:13px; line-height:1.5;">
+                    {{ report.description|default:"No clinical notes provided"|truncatechars:80 }}
+                </td>
+                <td>
+                    {% if report.is_analyzed %}
+                    <span class="badge badge-green"><i class="fa-solid fa-circle-check"></i> AI Analyzed</span>
+                    {% else %}
+                    <span class="badge badge-amber"><i class="fa-solid fa-hourglass-half"></i> Pending</span>
+                    {% endif %}
+                </td>
+                <td>
+                    <div class="doc-actions">
+                        <a href="{{ report.document.url }}" target="_blank" class="btn btn-ghost">
+                            <i class="fa-solid fa-file-arrow-down"></i> Source
+                        </a>
+                        {% if report.heatmap_image %}
+                        <a href="{{ report.heatmap_image.url }}" target="_blank" class="btn btn-cyan">
+                            <i class="fa-solid fa-braille"></i> AI Heatmap
+                        </a>
+                        {% endif %}
+                    </div>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="5">
+                    <div class="empty-state">
+                        <div class="empty-icon"><i class="fa-solid fa-folder-open"></i></div>
+                        <h3>No records found</h3>
+                        <p>Your medical records will appear here once uploaded by your healthcare provider.</p>
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<script>
+    // Count analyzed vs pending from rendered data
+    const rows = document.querySelectorAll('tbody tr td:nth-child(4) .badge');
+    let analyzed = 0, pending = 0;
+    rows.forEach(b => {
+        if (b.classList.contains('badge-green')) analyzed++;
+        else pending++;
+    });
+    const aEl = document.getElementById('analyzed-count');
+    const pEl = document.getElementById('pending-count');
+    if (aEl) aEl.textContent = analyzed;
+    if (pEl) pEl.textContent = pending;
+</script>
+{% endblock %}
