@@ -1,0 +1,675 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CuraMind AI — HIPAA-Compliant Telehealth Diagnostics</title>
+    <meta name="description"
+        content="CuraMind AI is a secure, HIPAA-compliant AI-powered telehealth diagnostics platform for patients and doctors.">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --cyan: #00d4ff;
+            --green: #00e5a0;
+            --purple: #a78bfa;
+            --red: #ff4d6a;
+            --bg: #060b14;
+            --card: rgba(255, 255, 255, 0.04);
+            --border: rgba(255, 255, 255, 0.08);
+            --text: #f0f6ff;
+            --muted: #6b7fa3;
+        }
+
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* Grid BG */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(0, 212, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 212, 255, 0.03) 1px, transparent 1px);
+            background-size: 48px 48px;
+            pointer-events: none;
+        }
+
+        /* Orb */
+        .orb {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(80px);
+            pointer-events: none;
+        }
+
+        .orb-1 {
+            width: 500px;
+            height: 500px;
+            top: -150px;
+            right: -100px;
+            background: radial-gradient(circle, rgba(0, 212, 255, 0.08), transparent 70%);
+        }
+
+        .orb-2 {
+            width: 400px;
+            height: 400px;
+            bottom: -100px;
+            left: -100px;
+            background: radial-gradient(circle, rgba(0, 229, 160, 0.06), transparent 70%);
+        }
+
+        /* NAV */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            padding: 0 48px;
+            height: 68px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(6, 11, 20, 0.85);
+            border-bottom: 1px solid var(--border);
+            backdrop-filter: blur(16px);
+        }
+
+        .nav-logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+        }
+
+        .nav-logo-icon {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, var(--cyan), var(--green));
+            border-radius: 9px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            box-shadow: 0 0 16px rgba(0, 212, 255, 0.3);
+        }
+
+        .nav-logo-text {
+            font-size: 20px;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--cyan), var(--green));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .nav-link {
+            padding: 8px 18px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .nav-link-ghost {
+            color: var(--muted);
+        }
+
+        .nav-link-ghost:hover {
+            background: var(--card);
+            color: var(--text);
+        }
+
+        .nav-link-cta {
+            background: linear-gradient(135deg, var(--cyan), #0099cc);
+            color: #060b14;
+            font-weight: 700;
+            box-shadow: 0 4px 14px rgba(0, 212, 255, 0.3);
+        }
+
+        .nav-link-cta:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(0, 212, 255, 0.4);
+        }
+
+        /* HERO */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 100px 24px 60px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 16px;
+            border-radius: 20px;
+            background: rgba(0, 229, 160, 0.1);
+            border: 1px solid rgba(0, 229, 160, 0.25);
+            color: var(--green);
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            margin-bottom: 28px;
+            animation: fadeInUp 0.5s ease;
+        }
+
+        .hero-title {
+            font-size: clamp(40px, 7vw, 80px);
+            font-weight: 900;
+            line-height: 1.1;
+            letter-spacing: -2px;
+            margin-bottom: 24px;
+            animation: fadeInUp 0.5s ease 0.1s both;
+        }
+
+        .hero-title .grad {
+            background: linear-gradient(135deg, var(--cyan), var(--green));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero-sub {
+            font-size: clamp(16px, 2vw, 20px);
+            color: var(--muted);
+            max-width: 600px;
+            margin: 0 auto 40px;
+            line-height: 1.7;
+            animation: fadeInUp 0.5s ease 0.2s both;
+        }
+
+        .hero-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            flex-wrap: wrap;
+            animation: fadeInUp 0.5s ease 0.3s both;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 14px 28px;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 700;
+            text-decoration: none;
+            transition: all 0.25s;
+            cursor: pointer;
+            border: none;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--cyan), #0099cc);
+            color: #060b14;
+            box-shadow: 0 6px 20px rgba(0, 212, 255, 0.35);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(0, 212, 255, 0.4);
+        }
+
+        .btn-outline {
+            background: var(--card);
+            border: 1px solid var(--border);
+            color: var(--text);
+        }
+
+        .btn-outline:hover {
+            border-color: rgba(0, 212, 255, 0.3);
+            background: rgba(0, 212, 255, 0.06);
+        }
+
+        /* STATS BAR */
+        .stats-bar {
+            display: flex;
+            gap: 40px;
+            justify-content: center;
+            flex-wrap: wrap;
+            padding: 32px 24px;
+            border-top: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+            margin: 0 -24px;
+            background: var(--card);
+            animation: fadeInUp 0.5s ease 0.4s both;
+        }
+
+        .stats-bar-item {
+            text-align: center;
+        }
+
+        .stats-bar-value {
+            font-size: 32px;
+            font-weight: 900;
+            letter-spacing: -1px;
+            background: linear-gradient(135deg, var(--cyan), var(--green));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .stats-bar-label {
+            font-size: 13px;
+            color: var(--muted);
+            margin-top: 4px;
+            font-weight: 500;
+        }
+
+        /* FEATURES */
+        .features {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 80px 24px;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .feature-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 28px;
+            transition: all 0.25s;
+        }
+
+        .feature-card:hover {
+            border-color: rgba(0, 212, 255, 0.2);
+            transform: translateY(-4px);
+            box-shadow: 0 16px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .feature-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            margin-bottom: 18px;
+        }
+
+        .feature-title {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .feature-desc {
+            font-size: 14px;
+            color: var(--muted);
+            line-height: 1.7;
+        }
+
+        /* LOGIN PORTAL */
+        .portal {
+            max-width: 480px;
+            margin: 0 auto;
+            padding: 0 24px 80px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .portal-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 24px 64px rgba(0, 0, 0, 0.4);
+        }
+
+        .portal-header {
+            padding: 28px 32px 24px;
+            border-bottom: 1px solid var(--border);
+            background: rgba(0, 212, 255, 0.04);
+        }
+
+        .portal-title {
+            font-size: 20px;
+            font-weight: 800;
+        }
+
+        .portal-sub {
+            font-size: 13px;
+            color: var(--muted);
+            margin-top: 4px;
+        }
+
+        .portal-body {
+            padding: 28px 32px;
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--muted);
+            margin-bottom: 6px;
+            letter-spacing: 0.3px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 11px 14px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text);
+            font-size: 14px;
+            font-family: 'Inter', sans-serif;
+            outline: none;
+            transition: all 0.2s;
+        }
+
+        .form-input:focus {
+            border-color: rgba(0, 212, 255, 0.4);
+            background: rgba(0, 212, 255, 0.04);
+            box-shadow: 0 0 0 3px rgba(0, 212, 255, 0.1);
+        }
+
+        .form-input::placeholder {
+            color: var(--muted);
+        }
+
+        .form-submit {
+            width: 100%;
+            padding: 13px;
+            background: linear-gradient(135deg, var(--cyan), #0099cc);
+            color: #060b14;
+            font-size: 15px;
+            font-weight: 700;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-top: 8px;
+            box-shadow: 0 4px 16px rgba(0, 212, 255, 0.3);
+        }
+
+        .form-submit:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 24px rgba(0, 212, 255, 0.4);
+        }
+
+        .form-footer {
+            text-align: center;
+            font-size: 13px;
+            color: var(--muted);
+            margin-top: 20px;
+        }
+
+        .form-footer a {
+            color: var(--cyan);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        /* FOOTER */
+        footer {
+            border-top: 1px solid var(--border);
+            padding: 32px 48px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 16px;
+            position: relative;
+            z-index: 1;
+        }
+
+        footer .copy {
+            font-size: 13px;
+            color: var(--muted);
+        }
+
+        footer .hipaa {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+            color: var(--green);
+            font-weight: 600;
+            background: rgba(0, 229, 160, 0.08);
+            border: 1px solid rgba(0, 229, 160, 0.2);
+            padding: 6px 12px;
+            border-radius: 20px;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width:640px) {
+            nav {
+                padding: 0 16px;
+            }
+
+            .hero {
+                padding: 90px 16px 40px;
+            }
+
+            footer {
+                padding: 24px 16px;
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .stats-bar {
+                gap: 24px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+
+    <!-- NAV -->
+    <nav>
+        <a href="/" class="nav-logo">
+            <div class="nav-logo-icon">🧠</div>
+            <span class="nav-logo-text">CuraMind AI</span>
+        </a>
+        <div class="nav-links">
+            <a href="#features" class="nav-link nav-link-ghost">Features</a>
+            <a href="#portal" class="nav-link nav-link-ghost">Login</a>
+            <a href="/admin/login/" class="nav-link nav-link-cta"><i class="fa-solid fa-lock"></i> Secure Access</a>
+        </div>
+    </nav>
+
+    <!-- HERO -->
+    <section class="hero">
+        <div class="hero-pill">
+            <i class="fa-solid fa-shield-halved"></i> HIPAA Compliant + AI-Powered
+        </div>
+        <h1 class="hero-title">
+            The Future of<br>
+            <span class="grad">Medical Diagnostics</span>
+        </h1>
+        <p class="hero-sub">
+            CuraMind AI uses advanced deep learning to analyze X-rays, MRIs, and DICOM scans — delivering accurate,
+            fast, and secure diagnostic insights to doctors and patients.
+        </p>
+        <div class="hero-actions">
+            <a href="/admin/login/" class="btn btn-primary">
+                <i class="fa-solid fa-right-to-bracket"></i> Doctor / Admin Login
+            </a>
+            <a href="#features" class="btn btn-outline">
+                <i class="fa-solid fa-circle-play"></i> See How It Works
+            </a>
+        </div>
+    </section>
+
+    <!-- STATS BAR -->
+    <div class="stats-bar">
+        <div class="stats-bar-item">
+            <div class="stats-bar-value">99.2%</div>
+            <div class="stats-bar-label">AI Accuracy Rate</div>
+        </div>
+        <div class="stats-bar-item">
+            <div class="stats-bar-value">&lt;30s</div>
+            <div class="stats-bar-label">Analysis Time</div>
+        </div>
+        <div class="stats-bar-item">
+            <div class="stats-bar-value">HIPAA</div>
+            <div class="stats-bar-label">Fully Compliant</div>
+        </div>
+        <div class="stats-bar-item">
+            <div class="stats-bar-value">256-bit</div>
+            <div class="stats-bar-label">AES Encryption</div>
+        </div>
+    </div>
+
+    <!-- FEATURES -->
+    <section class="features" id="features">
+        <div class="feature-card">
+            <div class="feature-icon" style="background:rgba(0,212,255,0.1);color:#00d4ff;">
+                <i class="fa-solid fa-brain"></i>
+            </div>
+            <div class="feature-title">AI-Powered Analysis</div>
+            <div class="feature-desc">Deep learning models process X-rays, MRIs, and DICOM files, generating visual
+                heatmaps highlighting abnormalities for faster clinical decisions.</div>
+        </div>
+
+        <div class="feature-card">
+            <div class="feature-icon" style="background:rgba(0,229,160,0.1);color:#00e5a0;">
+                <i class="fa-solid fa-shield-halved"></i>
+            </div>
+            <div class="feature-title">HIPAA Compliant</div>
+            <div class="feature-desc">End-to-end encrypted file storage, signed URLs, magic-byte validation, and
+                role-based access control ensure full HIPAA compliance.</div>
+        </div>
+
+        <div class="feature-card">
+            <div class="feature-icon" style="background:rgba(167,139,250,0.1);color:#a78bfa;">
+                <i class="fa-solid fa-users-between-lines"></i>
+            </div>
+            <div class="feature-title">Role-Based Dashboards</div>
+            <div class="feature-desc">Separate, secure dashboards for patients to view their records and doctors to
+                manage assigned diagnostics with full clinical context.</div>
+        </div>
+
+        <div class="feature-card">
+            <div class="feature-icon" style="background:rgba(255,184,0,0.1);color:#ffb800;">
+                <i class="fa-solid fa-bolt"></i>
+            </div>
+            <div class="feature-title">Async Processing</div>
+            <div class="feature-desc">Celery + Redis power background AI processing — scans are queued instantly after
+                upload and analyzed without blocking the interface.</div>
+        </div>
+
+        <div class="feature-card">
+            <div class="feature-icon" style="background:rgba(255,77,106,0.1);color:#ff4d6a;">
+                <i class="fa-solid fa-file-waveform"></i>
+            </div>
+            <div class="feature-title">Multi-Format Support</div>
+            <div class="feature-desc">Accepts JPEG, PNG, DICOM (.dcm), and PDF medical files. File-type is validated
+                using magic-byte inspection, not just extension.</div>
+        </div>
+
+        <div class="feature-card">
+            <div class="feature-icon" style="background:rgba(0,212,255,0.1);color:#00d4ff;">
+                <i class="fa-solid fa-cloud-arrow-up"></i>
+            </div>
+            <div class="feature-title">Secure Cloud Storage</div>
+            <div class="feature-desc">AWS S3 integration with private buckets, time-limited signed URLs (5 min expiry),
+                and no public access — medical data stays protected.</div>
+        </div>
+    </section>
+
+    <!-- LOGIN PORTAL -->
+    <section id="portal" class="portal">
+        <div class="portal-card">
+            <div class="portal-header">
+                <div class="portal-title"><i class="fa-solid fa-user-shield"
+                        style="color:#00d4ff;margin-right:8px;"></i>Secure Access Portal</div>
+                <div class="portal-sub">HIPAA-authenticated login for patients and providers</div>
+            </div>
+            <div class="portal-body">
+                <form method="post" action="/admin/login/?next=/diagnostics/my-reports/">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label class="form-label" for="id_username"><i class="fa-solid fa-user fa-sm"></i>
+                            Username</label>
+                        <input class="form-input" type="text" id="id_username" name="username"
+                            placeholder="Enter your username" autocomplete="username" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="id_password"><i class="fa-solid fa-lock fa-sm"></i>
+                            Password</label>
+                        <input class="form-input" type="password" id="id_password" name="password"
+                            placeholder="••••••••••" autocomplete="current-password" required>
+                    </div>
+                    <button type="submit" class="form-submit">
+                        <i class="fa-solid fa-right-to-bracket"></i> Sign In Securely
+                    </button>
+                    <div class="form-footer">
+                        Doctors & admins: <a href="/admin/login/">use full admin login →</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer>
+        <div class="copy">
+            © 2026 CuraMind AI. All rights reserved. Built for HIPAA compliance.<br>
+            <span style="color:#a78bfa;font-weight:600;">✦ Created by Archit Yadav</span>
+        </div>
+        <div class="hipaa"><i class="fa-solid fa-lock"></i> HIPAA Encrypted Platform</div>
+    </footer>
+</body>
+
+</html>
