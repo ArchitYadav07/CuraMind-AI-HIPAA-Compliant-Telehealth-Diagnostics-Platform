@@ -12,7 +12,17 @@
 
 CuraMind AI is a secure, modular diagnostic platform designed to bridge the gap between patients and doctors through AI-driven medical image analysis. It features robust Role-Based Access Control (RBAC), secure DICOM/image handling, and asynchronous processing for high-performance diagnostics.
 
-## 🖼️ Visual Showcase
+## 🖼️ User Interface
+
+| Home Page | Login Page |
+| --- | --- |
+| <img src="screenshot/home-page.png" width="400"> | <img src="screenshot/login-page.png" width="400"> |
+
+| Patient Diagnostics | My Records |
+| --- | --- |
+| <img src="screenshot/patient-diagnositcs.png" width="400"> | <img src="screenshot/my-records.png" width="400"> |
+
+## 🧬 Visual Showcase (AI Heatmaps)
 
 | Input Medical X-Ray | AI-Generated Heatmap Analysis |
 | --- | --- |
